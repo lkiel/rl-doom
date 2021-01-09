@@ -1,0 +1,1 @@
+tensorboard --logdir=../standalone_examples/logs/tensorboard
