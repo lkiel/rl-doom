@@ -82,7 +82,7 @@ def create_env(scenario: str, **kwargs) -> DoomEnv:
     game.load_config(f'scenarios/{scenario}.cfg')
     game.init()
 
-    # Wrap the environment with the Gym adapter.
+    # Wrap the game with the Gym adapter.
     return DoomEnv(game, **kwargs)
 
 
