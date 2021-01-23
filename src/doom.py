@@ -12,7 +12,6 @@ if __name__ == '__main__':
     parser = cli.get_parser()
     args = parser.parse_args()
 
-    scenario = args.scenario
     load_from = args.load
     features_only = args.features_only
     config_path = args.config

@@ -35,6 +35,11 @@ class EnvironmentConfig:
         self.frame_stack = params['frame_stack']
         self.frame_skip = params['frame_skip']
 
+        # Action space parameters
+        self.action_combination = params['action_combination']
+        self.action_noop = params['action_noop']
+
+        # Observation space parameters
         self.raw_channels = params['obs_channels']
         self.raw_width = params['obs_width']
         self.raw_height = params['obs_height']

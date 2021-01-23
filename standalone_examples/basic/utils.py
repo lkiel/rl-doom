@@ -8,11 +8,10 @@ def get_sample_frame(resolution: ScreenResolution) -> np.ndarray:
     game = vizdoom.DoomGame()
     game.load_config('scenarios/basic.cfg')
     game.set_seed(0)
-
-    # Test 160 by 120 resolution
     game.set_screen_resolution(resolution)
     game.init()
 
+    # Collect frame
     frame = game.get_state().screen_buffer
 
     game.close()

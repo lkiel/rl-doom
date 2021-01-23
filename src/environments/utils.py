@@ -23,12 +23,15 @@ def create_game(environment_config: EnvironmentConfig) -> t.Tuple[DoomGame, Acti
 
     # Game configuration
     game.load_config(f'{paths.SCENARIOS}/{environment_config.scenario}.cfg')
-    game.set_doom_scenario_path(f'{paths.SCENARIOS}/{environment_config.scenario}.wad')
     game.set_mode(environment_config.game_mode)
     game.set_screen_format(environment_config.screen_mode)
     game.init()
 
-    possible_actions = controls.get_available_actions(game.get_available_buttons())
+    possible_actions = controls.get_available_actions(
+        game.get_available_buttons(),
+        environment_config.action_combination,
+        environment_config.action_noop
+    )
 
     return game, possible_actions
 

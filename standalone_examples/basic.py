@@ -3,7 +3,7 @@ from stable_baselines3 import ppo
 from stable_baselines3.common import callbacks
 from stable_baselines3.common import policies
 
-import common
+from common import envs
 
 if __name__ == '__main__':
     # Create training and evaluation environments.
@@ -15,8 +15,8 @@ if __name__ == '__main__':
     }
 
     # Create training and evaluation environments.
-    training_env = common.create_vec_env(**env_args)
-    eval_env = common.create_vec_env(**env_args)
+    training_env = envs.create_vec_env(**env_args)
+    eval_env = envs.create_vec_env(**env_args)
 
     # Create an agent.
     agent = ppo.PPO(policy=policies.ActorCriticCnnPolicy,
