@@ -3,7 +3,7 @@
     "name": "PPO",
     "parameters": {
       "verbose": 1,
-      "n_steps": 4096,
+      "n_steps": 1024,
       "batch_size": 32,
       "seed": 123
     },
@@ -26,7 +26,7 @@
     "scenario": "defend_the_center_relaxed",
     "type": "singleplayer",
     "vizdoom_mode": "PLAYER",
-    "n_parallel": 4,
+    "n_parallel": 1,
     "frame_skip": 4,
     "frame_stack": 1,
     "action_combination": true,

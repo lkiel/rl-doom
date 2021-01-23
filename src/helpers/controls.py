@@ -102,8 +102,10 @@ def get_available_actions(buttons: np.array, include_combinations=False, include
         if not include_no_op:
             possible_actions = possible_actions[np.sum(possible_actions, axis=1) > 0]
 
+        possible_actions = possible_actions.tolist()
+
     print('Built action space of size {} from buttons {}'.format(len(possible_actions), buttons))
-    return possible_actions.tolist()
+    return possible_actions
 
 
 if __name__ == '__main__':

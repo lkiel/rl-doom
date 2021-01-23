@@ -3,6 +3,8 @@ import torch as th
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from torch import nn
 
+from models.hooks import Hook, Hooks
+
 
 class CNNFeatureExtractor(BaseFeaturesExtractor):
     def __init__(self, observation_space: gym.spaces.Box, features_dim: int = 128, **kwargs):
@@ -33,6 +35,8 @@ class CNNFeatureExtractor(BaseFeaturesExtractor):
             nn.LayerNorm(features_dim),
             nn.LeakyReLU(negative_slope=0.1),
         )
+
+        self.hooks = Hooks(self.cnn, self.linear)
 
     def forward(self, observations: th.Tensor) -> th.Tensor:
         return self.linear(self.cnn(observations))

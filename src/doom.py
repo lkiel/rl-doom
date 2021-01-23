@@ -1,6 +1,7 @@
 from stable_baselines3.common.callbacks import EvalCallback
 
 import config
+from callbacks.LayerMonitoring import LayerActivationMonitoring
 from environments import constants as env_constants
 from environments import utils as env_utils
 from helpers import cli
@@ -36,13 +37,15 @@ if __name__ == '__main__':
         helpers.init_weights(agent, conf.model_config)
 
     # Start the training process.
+    layer_monitoring = LayerActivationMonitoring()
     evaluation_callback = EvalCallback(eval_env,
                                        n_eval_episodes=10,
                                        eval_freq=15000,
                                        best_model_save_path=model_folder,
                                        deterministic=True)
 
-    agent.learn(total_timesteps=5000000, tb_log_name=name_suffix.replace('/', '_'), callback=[evaluation_callback])
+    agent.learn(total_timesteps=5000000, tb_log_name=name_suffix.replace('/', '_'),
+                callback=[evaluation_callback, layer_monitoring])
 
     env.close()
     eval_env.close()
