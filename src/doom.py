@@ -33,6 +33,8 @@ if __name__ == '__main__':
     # Build the agent
     agent = conf.get_agent(env=env, load_from=load_from)
 
+    print(agent.policy)
+
     if not load_from:
         helpers.init_weights(agent, conf.model_config)
 
@@ -40,11 +42,11 @@ if __name__ == '__main__':
     layer_monitoring = LayerActivationMonitoring()
     evaluation_callback = EvalCallback(eval_env,
                                        n_eval_episodes=10,
-                                       eval_freq=15000,
+                                       eval_freq=8196,
                                        best_model_save_path=model_folder,
                                        deterministic=True)
 
-    agent.learn(total_timesteps=5000000, tb_log_name=name_suffix.replace('/', '_'),
+    agent.learn(total_timesteps=250000, tb_log_name=name_suffix.replace('/', '_'),
                 callback=[evaluation_callback, layer_monitoring])
 
     env.close()

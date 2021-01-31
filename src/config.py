@@ -91,6 +91,7 @@ class ModelConfig:
         self.policy_kwargs = {
             'features_extractor_class': constants.NETS[self.policy_params['feature_extractor']],
             'features_extractor_kwargs': {
+                'norm': self.policy_params['norm'],
                 'negative_slope': self.policy_params['relu_slope']
             },
             'net_arch': params['policy']['net_arch'],

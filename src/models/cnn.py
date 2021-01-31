@@ -25,7 +25,7 @@ class CNNFeatureExtractor(BaseFeaturesExtractor):
 
         n_flatten = self.compute_shape(self.cnn)[1]
 
-        self.linear = nn.Sequential(*self.linear_layer(n_flatten, features_dim, norm=norm))
+        self.linear = nn.Sequential(*self.linear_layer(n_flatten, features_dim, norm=norm, **kwargs))
 
         self.hooks = Hooks(self.cnn, self.linear)
 
@@ -47,7 +47,7 @@ class CNNFeatureExtractor(BaseFeaturesExtractor):
         return layers
 
     def linear_layer(self, n_in, n_out, norm=None, **kwargs):
-        layers = [nn.Linear(n_in, n_out, bias=norm is None),]
+        layers = [nn.Linear(n_in, n_out, bias=norm is None)]
 
         if norm == 'layer':
             layers.append(nn.LayerNorm(n_out))

@@ -1,0 +1,50 @@
+{
+  "model": {
+    "name": "PPO",
+    "parameters": {
+      "verbose": 1,
+      "n_steps": 8192,
+      "batch_size": 32,
+      "n_epochs": 3,
+      "seed": 123
+    },
+    "policy": {
+      "relu_slope": 0.1,
+      "norm": null,
+      "feature_extractor": "CNNFeatureExtractor",
+      "net_arch": [{"pi": [], "vf": []}]
+    }
+  },
+  "schedules": {
+    "lr_start": 1e-4,
+    "lr_mid": 1e-3,
+    "lr_end": 1e-5,
+    "lr_pcts": [
+      0.4,
+      0.6
+    ]
+  },
+  "env": {
+    "scenario": "defend_the_center_relaxed",
+    "type": "singleplayer",
+    "vizdoom_mode": "PLAYER",
+    "n_parallel": 2,
+    "frame_skip": 4,
+    "frame_stack": 1,
+    "action_combination": true,
+    "action_noop": false,
+    "obs_width": 320,
+    "obs_height": 240,
+    "obs_channels": 3,
+    "obs_crop": [
+      40,
+      0,
+      0,
+      0
+    ],
+    "obs_resize": [
+      0.5,
+      0.5
+    ]
+  }
+}

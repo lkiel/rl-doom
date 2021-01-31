@@ -1,6 +1,6 @@
 import typing as t
 
-from stable_baselines3.common.vec_env import VecTransposeImage, VecFrameStack, SubprocVecEnv
+from stable_baselines3.common.vec_env import VecTransposeImage, VecFrameStack, SubprocVecEnv, DummyVecEnv
 from vizdoom.vizdoom import DoomGame
 import paths
 from config import EnvironmentConfig
@@ -51,7 +51,7 @@ def create_vectorized_environment(n_envs: int, frame_stack: int, env_creation_fu
     :param env_creation_func: A callable returning a Gym environment.
     :return: A vectorized environment with frame stacking and image transposition.
     """
-    return VecTransposeImage(VecFrameStack(SubprocVecEnv([env_creation_func] * n_envs), frame_stack))
+    return VecTransposeImage(VecFrameStack(DummyVecEnv([env_creation_func] * n_envs), frame_stack))
 
 
 def get_training_env(environment_config: EnvironmentConfig) -> VecTransposeImage:

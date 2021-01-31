@@ -3,14 +3,16 @@
     "name": "PPO",
     "parameters": {
       "verbose": 1,
-      "n_steps": 1024,
+      "n_steps": 4096,
       "batch_size": 32,
+      "n_epochs": 3,
       "seed": 123
     },
     "policy": {
       "relu_slope": 0.1,
+      "norm": "layer",
       "feature_extractor": "CNNFeatureExtractor",
-      "net_arch": [{"pi": [64], "vf": [64]}]
+      "net_arch": [{"pi": [], "vf": []}]
     }
   },
   "schedules": {
@@ -23,13 +25,13 @@
     ]
   },
   "env": {
-    "scenario": "defend_the_center_relaxed",
+    "scenario": "defend_the_center",
     "type": "singleplayer",
     "vizdoom_mode": "PLAYER",
-    "n_parallel": 1,
+    "n_parallel": 2,
     "frame_skip": 4,
     "frame_stack": 1,
-    "action_combination": true,
+    "action_combination": false,
     "action_noop": false,
     "obs_width": 320,
     "obs_height": 240,
