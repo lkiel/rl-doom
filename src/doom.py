@@ -1,6 +1,7 @@
 from stable_baselines3.common.callbacks import EvalCallback
 
 import config
+from callbacks.FragEvalCallback import FragEvalCallback
 from callbacks.LayerMonitoring import LayerActivationMonitoring
 from environments import constants as env_constants
 from environments import utils as env_utils
@@ -40,13 +41,13 @@ if __name__ == '__main__':
 
     # Start the training process.
     layer_monitoring = LayerActivationMonitoring()
-    evaluation_callback = EvalCallback(eval_env,
-                                       n_eval_episodes=10,
-                                       eval_freq=8196,
-                                       best_model_save_path=model_folder,
-                                       deterministic=True)
+    evaluation_callback = FragEvalCallback(eval_env,
+                                           n_eval_episodes=10,
+                                           eval_freq=16384,
+                                           best_model_save_path=model_folder,
+                                           deterministic=True)
 
-    agent.learn(total_timesteps=250000, tb_log_name=name_suffix.replace('/', '_'),
+    agent.learn(total_timesteps=5000000, tb_log_name=name_suffix.replace('/', '_'),
                 callback=[evaluation_callback, layer_monitoring])
 
     env.close()

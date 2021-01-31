@@ -31,9 +31,12 @@ class EnvironmentConfig:
     def __init__(self, params: t.Dict):
         self.scenario = params['scenario']
 
+        # Doom env parameters
         self.n_envs = params['n_parallel']
         self.frame_stack = params['frame_stack']
         self.frame_skip = params['frame_skip']
+        self.env_type = params['type']
+        self.env_args = params['args']
 
         # Action space parameters
         self.action_combination = params['action_combination']
