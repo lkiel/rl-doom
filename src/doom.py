@@ -25,7 +25,7 @@ if __name__ == '__main__':
     env, eval_env = env_utils.get_envs(conf.environment_config)
 
     # Set-up the logging folder
-    name_suffix = conf.get_log_name(env_constants.OBS_SHAPE, env.action_space.n)
+    name_suffix = conf.get_log_name(env_constants.OBS_SHAPE, env.action_space.n) + '_env_ng2'
     model_folder = f'{paths.MODEL_LOGS}/{name_suffix}/'
 
     # Save the parameters used next to the best model

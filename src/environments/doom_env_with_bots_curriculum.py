@@ -8,9 +8,9 @@ from environments.doom_env_with_bots import DoomWithBots
 
 class DoomWithCurriculum(DoomWithBots):
 
-    def __init__(self, doom_game, possible_actions, environment_config: EnvironmentConfig,
+    def __init__(self, doom_game, possible_actions, maps, environment_config: EnvironmentConfig,
                  initial_level=0, max_level=5, rolling_mean_length=10):
-        super().__init__(doom_game, possible_actions, environment_config)
+        super().__init__(doom_game, possible_actions, maps, environment_config)
         doom_game.send_game_command('pukename change_difficulty 0')
         self.level = initial_level
         self.max_level = max_level

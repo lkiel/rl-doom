@@ -22,11 +22,15 @@ WEAPON_VARIABLES = [GameVariable.WEAPON0, GameVariable.WEAPON1, GameVariable.WEA
 
 class DoomWithBots(DoomEnv):
 
-    def __init__(self, doom_game, possible_actions, environment_config: EnvironmentConfig):
+    def __init__(self, doom_game, possible_actions, maps, environment_config: EnvironmentConfig):
         super().__init__(doom_game, possible_actions, environment_config)
 
         self.name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=2))
         self.n_bots = environment_config.env_args['bots']
+        self.maps = maps
+
+        print(maps)
+
         self.total_rew = 0
         self.last_damage_dealt = 0
         self.deaths = 0
@@ -62,7 +66,7 @@ class DoomWithBots(DoomEnv):
 
         # Pistol clips have 10 bullets
         self.reward_factor_ammo_increment = 0.02
-        self.reward_factor_ammo_decrement = -0.02
+        self.reward_factor_ammo_decrement = -0.01
 
         # Player starts at 100 health
         self.reward_factor_health_increment = 0.02
@@ -92,15 +96,13 @@ class DoomWithBots(DoomEnv):
         self.last_x = x
         self.last_y = y
 
-        # Proportion of max distance since last update between 0 and 1
         distance = np.sqrt(dx ** 2 + dy ** 2)
-
         d = distance - self.reward_threshold_distance
 
         if d > 0:
-            reward = self.reward_factor_distance * d
+            reward = 0.0005 #self.reward_factor_distance * d
         else:
-            reward = self.penalty_factor_distance * d
+            reward = -0.0005 #self.penalty_factor_distance * d
 
         self._log_reward_stat('distance', reward)
 
@@ -216,6 +218,9 @@ class DoomWithBots(DoomEnv):
 
     def reset(self):
         self._print_state()
+
+        self.game.set_doom_map(np.random.choice(self.maps))
+
         state = super().reset()
 
         self.last_x, self.last_y = self._get_player_pos()

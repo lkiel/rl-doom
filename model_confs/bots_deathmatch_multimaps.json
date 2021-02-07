@@ -25,16 +25,16 @@
     ]
   },
   "env": {
-    "scenario": "bots_deathmatch_v1",
+    "scenario": "bots_deathmatch_multimaps",
     "type": "multiplayer",
     "args": {
-      "map": "flatmap3",
+      "maps": ["M", "M_R"],
       "bots": 8,
       "curriculum": true
     },
     "vizdoom_mode": "PLAYER",
     "n_parallel": 4,
-    "frame_skip": 4,
+    "frame_skip": 1,
     "frame_stack": 1,
     "action_combination": true,
     "action_noop": false,

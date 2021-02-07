@@ -1,6 +1,6 @@
 import typing as t
 
-from stable_baselines3.common.vec_env import VecTransposeImage, VecFrameStack, DummyVecEnv
+from stable_baselines3.common.vec_env import VecTransposeImage, VecFrameStack, DummyVecEnv, SubprocVecEnv
 from vizdoom.vizdoom import DoomGame
 
 import paths
@@ -41,16 +41,18 @@ def create_game(environment_config: EnvironmentConfig) -> t.Tuple[DoomGame, Acti
 def create_env_with_bots(environment_config: EnvironmentConfig, eval: bool) -> DoomEnv:
     """Creates a Doom environment."""
     game, possible_actions = create_game(environment_config)
-
-    game.set_doom_map(environment_config.env_args['map'])
     game.add_game_args('-host 1 -deathmatch +viz_nocheat 0 +cl_run 1 +name AGENT +colorset 0' +
                        '+sv_forcerespawn 1 +sv_respawnprotect 1 +sv_nocrouch 1 +sv_noexit 1')
     game.init()
 
+    maps = environment_config.env_args['maps']
+    if eval:
+        maps = [maps[0]]
+
     if environment_config.env_args['curriculum'] and not eval:
-        return DoomWithCurriculum(game, possible_actions, environment_config)
+        return DoomWithCurriculum(game, possible_actions, maps, environment_config)
     else:
-        return DoomWithBots(game, possible_actions, environment_config)
+        return DoomWithBots(game, possible_actions, maps, environment_config)
 
 
 def create_env(environment_config: EnvironmentConfig, eval: bool) -> DoomEnv:
@@ -72,7 +74,7 @@ def create_vectorized_environment(n_envs: int, frame_stack: int, env_creation_fu
     :param env_creation_func: A callable returning a Gym environment.
     :return: A vectorized environment with frame stacking and image transposition.
     """
-    return VecTransposeImage(VecFrameStack(DummyVecEnv([env_creation_func] * n_envs), frame_stack))
+    return VecTransposeImage(VecFrameStack(SubprocVecEnv([env_creation_func] * n_envs), frame_stack))
 
 
 def get_training_env(environment_config: EnvironmentConfig) -> VecTransposeImage:
