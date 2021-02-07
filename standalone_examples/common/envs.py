@@ -86,5 +86,9 @@ def create_env(scenario: str, **kwargs) -> DoomEnv:
     return DoomEnv(game, **kwargs)
 
 
-def create_vec_env(**kwargs) -> vec_env.VecTransposeImage:
-    return vec_env.VecTransposeImage(vec_env.DummyVecEnv([lambda: create_env(**kwargs)]))
+def create_vec_env(n_envs=1, **kwargs) -> vec_env.VecTransposeImage:
+    return vec_env.VecTransposeImage(vec_env.DummyVecEnv([lambda: create_env(**kwargs)] * n_envs))
+
+
+def create_eval_vec_env(**kwargs) -> vec_env.VecTransposeImage:
+    return create_vec_env(n_envs=1, **kwargs)

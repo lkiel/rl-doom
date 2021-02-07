@@ -9,7 +9,7 @@
       "seed": 123
     },
     "policy": {
-      "relu_slope": 0.1,
+      "relu_slope": 0.0,
       "norm": null,
       "feature_extractor": "CNNFeatureExtractor",
       "net_arch": [{"pi": [], "vf": []}]
@@ -27,6 +27,7 @@
   "env": {
     "scenario": "defend_the_center_relaxed",
     "type": "singleplayer",
+    "args": {},
     "vizdoom_mode": "PLAYER",
     "n_parallel": 2,
     "frame_skip": 4,

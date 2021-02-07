@@ -26,3 +26,5 @@ def init_weights(model: ActorCriticPolicy, model_config: ModelConfig):
 
     # Initialize value net
     init_net(model.policy.mlp_extractor.value_net, model_config)
+
+    # TODO: add missing last layers

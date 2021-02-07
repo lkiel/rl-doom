@@ -36,11 +36,11 @@ def evaluate_training(n: int, config_path):
     evaluation_callback = callbacks.EvalCallback(eval_env,
                                                  n_eval_episodes=10,
                                                  eval_freq=8192,
-                                                 log_path=f'logs/evaluations/defend_the_center_gerelu_{n}',
-                                                 best_model_save_path=f'logs/models/defend_the_center_gerelu_{n}')
+                                                 log_path=f'logs/evaluations/defend_the_center_relu_{n}',
+                                                 best_model_save_path=f'logs/models/defend_the_center_relu_{n}')
 
     # Play!
-    agent.learn(total_timesteps=500000, tb_log_name='ppo_defend_the_center_gerelu', callback=evaluation_callback)
+    agent.learn(total_timesteps=500000, tb_log_name='ppo_defend_the_center_relu', callback=[evaluation_callback, layer_monitoring])
 
     env.close()
     eval_env.close()
