@@ -1,3 +1,4 @@
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -44,3 +45,20 @@ def plot_activations(hooks):
         a.legend()
 
     plt.tight_layout()
+
+
+def plot_evaluation_results(path: str):
+    evaluations = np.load(path)
+    ts = evaluations['timesteps']
+    results = evaluations['results'].mean(axis=1).squeeze()
+
+    f, ax = plt.subplots(1, 1, figsize=(8, 5))
+    ticker = matplotlib.ticker.EngFormatter()
+    ax.xaxis.set_major_formatter(ticker)
+    ax.xaxis.set_minor_formatter(ticker)
+
+    ax.plot(ts, results)
+    ax.set_xlabel('Steps')
+    ax.set_ylabel('Mean reward')
+
+    ax.grid(True)
