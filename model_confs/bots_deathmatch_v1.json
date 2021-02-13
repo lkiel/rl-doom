@@ -28,7 +28,7 @@
     "scenario": "bots_deathmatch_v1",
     "type": "multiplayer",
     "args": {
-      "map": "flatmap3",
+      "maps": ["flatmap2"],
       "bots": 8,
       "curriculum": true
     },
