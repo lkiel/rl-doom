@@ -114,6 +114,7 @@ class TrainingConfig:
     """Class holding configuration for a training session."""
     def __init__(self, params: t.Dict):
         self.params = params
+        self.name = params['config_name']
         self.model_config = ModelConfig(params['model'])
         self.environment_config = EnvironmentConfig(params['env'])
         self.learning_config = LearningConfig(params['schedules'])
@@ -138,7 +139,7 @@ class TrainingConfig:
 
         else:
             print(f'Loading model from {load_from}')
-            return self.model_config.model_class.load(f'{paths.MODEL_LOGS}/{load_from}',
+            return self.model_config.model_class.load(f'{load_from}',
                                                       env=env,
                                                       learning_rate=self.learning_config.get_learning_schedule(),
                                                       **self.model_config.model_params)
@@ -151,7 +152,8 @@ class TrainingConfig:
                 scenario=basic_algo=PPO_nenvs=1_input=100x160x3-RGB24_stack=1_skip=4_output=3
 
         """
-        return '{}/{}_in={}_out={}'.format(
+        return '{}/{}/{}_in={}_out={}'.format(
+            self.name,
             self.environment_config.get_log_name(),
             self.model_config.get_log_name(),
             "x".join([str(dimension) for dimension in input_shape]),

@@ -1,5 +1,5 @@
 {
-  "config_name": "classic_multimap",
+  "config_name": "classic_singlemap",
   "model": {
     "name": "PPO",
     "parameters": {
@@ -29,7 +29,7 @@
     "scenario": "bots_deathmatch_multimaps",
     "type": "multiplayer",
     "args": {
-      "maps": ["M", "M_R"],
+      "maps": ["M"],
       "bots": 8,
       "curriculum": true
     },

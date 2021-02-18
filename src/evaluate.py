@@ -1,5 +1,3 @@
-import time
-
 from stable_baselines3.common import evaluation
 
 import config
@@ -20,18 +18,12 @@ if __name__ == '__main__':
     conf = config.load(config_path)
 
     # Create environments.
-    env = env_utils.get_evaluation_env(conf.environment_config)
+    eval_env = env_utils.get_evaluation_env(conf.environment_config)
 
     # Load agent
-    agent = conf.get_agent(env=env, load_from=load_from)
+    agent = conf.get_agent(env=eval_env, load_from=load_from)
 
-    for i in range(10):
-        obs = env.reset()
-        done = False
-        images = []
-        while not done:
-            action, _ = agent.predict(obs, deterministic=False)
-            obs, reward, done, _ = env.step(action)
-            time.sleep(1/60.0)
+    mean_reward, std_reward = evaluation.evaluate_policy(agent, eval_env, n_eval_episodes=100)
+    print(f'Mean reward {mean_reward} +/- {std_reward}')
 
-    env.close()
+    eval_env.close()
