@@ -1,5 +1,5 @@
 {
-  "config_name": "classic_singlemap",
+  "config_name": "classic_multimap",
   "model": {
     "name": "PPO",
     "parameters": {
@@ -12,7 +12,6 @@
     "policy": {
       "relu_slope": 0.1,
       "norm": "layer",
-      "conv_filters": [32, 64, 64],
       "features_dim": 512,
       "feature_extractor": "CNNFeatureExtractor",
       "net_arch": [{"pi": [256], "vf": [256]}]
@@ -20,7 +19,7 @@
   },
   "schedules": {
     "lr_start": 1e-4,
-    "lr_mid": 5e-4,
+    "lr_mid": 3e-4,
     "lr_end": 1e-5,
     "lr_pcts": [
       0.4,
@@ -31,14 +30,14 @@
     "scenario": "bots_deathmatch_multimaps",
     "type": "multiplayer",
     "args": {
-      "maps": ["M"],
+      "maps": ["M", "M_R"],
       "bots": 8,
-      "curriculum": true,
-      "shaping": true
+      "curriculum": false,
+      "shaping":  true
     },
     "vizdoom_mode": "PLAYER",
     "n_parallel": 4,
-    "frame_skip": 4,
+    "frame_skip": 2,
     "frame_stack": 1,
     "action_combination": true,
     "action_noop": false,

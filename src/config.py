@@ -54,7 +54,7 @@ class EnvironmentConfig:
         self.screen_resolution = environment_constants.RESOLUTION_TO_VZD[(self.raw_width, self.raw_height)]
 
     def get_log_name(self):
-        return 'scenario={}/nenvs={}_stack={}_skip={}'.format(
+        return '{}/nenvs={}_stack={}_skip={}'.format(
             self.scenario,
             self.n_envs,
             self.frame_stack,
@@ -94,6 +94,8 @@ class ModelConfig:
         self.policy_kwargs = {
             'features_extractor_class': constants.NETS[self.policy_params['feature_extractor']],
             'features_extractor_kwargs': {
+                'conv_filters': self.policy_params['conv_filters'],
+                'features_dim': self.policy_params['features_dim'],
                 'norm': self.policy_params['norm'],
                 'negative_slope': self.policy_params['relu_slope']
             },
@@ -103,8 +105,9 @@ class ModelConfig:
         }
 
     def get_log_name(self):
-        return 'algo={}_pi={}_vf={}'.format(
+        return 'algo={}_ft={}_pi={}_vf={}'.format(
             self.model,
+            self.policy_kwargs['features_extractor_kwargs']['features_dim'],
             '-'.join(map(str, self.policy_params['net_arch'][-1]['pi'])),
             '-'.join(map(str, self.policy_params['net_arch'][-1]['vf'])),
         )
@@ -139,7 +142,7 @@ class TrainingConfig:
 
         else:
             print(f'Loading model from {load_from}')
-            return self.model_config.model_class.load(f'{load_from}',
+            return self.model_config.model_class.load(f'{paths.MODEL_LOGS}/{load_from}',
                                                       env=env,
                                                       learning_rate=self.learning_config.get_learning_schedule(),
                                                       **self.model_config.model_params)

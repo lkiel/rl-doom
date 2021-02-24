@@ -185,7 +185,7 @@ def evaluate_policy(
             action, state = model.predict(obs, state=state, deterministic=deterministic)
             obs, reward, done, _info = env.step(action)
             episode_reward += reward
-            episode_frag = _info[0]['frags']
+            episode_frag = _info[0].get('frags', 0)
             if callback is not None:
                 callback(locals(), globals())
             episode_length += 1

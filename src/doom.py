@@ -25,7 +25,7 @@ if __name__ == '__main__':
     env, eval_env = env_utils.get_envs(conf.environment_config)
 
     # Set-up the logging folder
-    name_suffix = conf.get_log_name(env_constants.OBS_SHAPE, env.action_space.n) + '_env_ng2'
+    name_suffix = conf.get_log_name(env_constants.OBS_SHAPE, env.action_space.n)
     model_folder = f'{paths.MODEL_LOGS}/{name_suffix}/'
 
     # Save the parameters used next to the best model
@@ -42,12 +42,13 @@ if __name__ == '__main__':
     # Start the training process.
     layer_monitoring = LayerActivationMonitoring()
     evaluation_callback = FragEvalCallback(eval_env,
-                                           n_eval_episodes=10,
-                                           eval_freq=16384,
+                                           n_eval_episodes=5,
+                                           eval_freq=8192,
                                            best_model_save_path=model_folder,
+                                           log_path=f'{paths.EVALUATION_LOGS}/{name_suffix}/',
                                            deterministic=True)
 
-    agent.learn(total_timesteps=5000000, tb_log_name=name_suffix.replace('/', '_'),
+    agent.learn(total_timesteps=500000, tb_log_name=name_suffix.replace('/', '_'),
                 callback=[evaluation_callback, layer_monitoring])
 
     env.close()

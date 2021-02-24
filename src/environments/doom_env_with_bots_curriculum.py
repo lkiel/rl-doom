@@ -16,7 +16,7 @@ class DoomWithCurriculum(DoomWithBots):
         self.max_level = max_level
         self.rolling_mean_length = rolling_mean_length
         self.last_rewards = deque(maxlen=rolling_mean_length)
-        self.reward_thresholds = [15, 20, 25, 30, 35, 40]
+        self.reward_thresholds = [5, 10, 15, 20, 25, 30]
 
     def step(self, action, array=False):
         state, reward, done, infos = super().step(action, array)

@@ -1,4 +1,5 @@
 {
+  "config_name": "classic",
   "model": {
     "name": "PPO",
     "parameters": {
@@ -9,15 +10,17 @@
       "seed": 123
     },
     "policy": {
-      "relu_slope": 0.0,
-      "norm": null,
+      "relu_slope": 0.1,
+      "norm": "layer",
+      "conv_filters": [32, 64, 64],
+      "features_dim": 128,
       "feature_extractor": "CNNFeatureExtractor",
       "net_arch": [{"pi": [], "vf": []}]
     }
   },
   "schedules": {
     "lr_start": 1e-4,
-    "lr_mid": 1e-3,
+    "lr_mid": 1e-4,
     "lr_end": 1e-5,
     "lr_pcts": [
       0.4,
@@ -30,7 +33,7 @@
     "args": {},
     "vizdoom_mode": "PLAYER",
     "n_parallel": 2,
-    "frame_skip": 4,
+    "frame_skip": 1,
     "frame_stack": 1,
     "action_combination": true,
     "action_noop": false,
@@ -39,9 +42,9 @@
     "obs_channels": 3,
     "obs_crop": [
       40,
+      4,
       0,
-      0,
-      0
+      4
     ],
     "obs_resize": [
       0.5,

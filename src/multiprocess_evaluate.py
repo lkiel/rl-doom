@@ -5,14 +5,15 @@ import cv2
 from stable_baselines3 import ppo
 from stable_baselines3.common import callbacks
 from stable_baselines3.common import policies
-
+from callbacks.FragEvalCallback import FragEvalCallback
 from callbacks.LayerMonitoring import LayerActivationMonitoring
 from environments import utils as env_utils
 from helpers import cli
 from models import helpers
 
 import config
-from common import envs
+
+NAME = 'dm_shaping_curriculum'
 
 
 def evaluate_training(n: int, config_path):
@@ -33,14 +34,15 @@ def evaluate_training(n: int, config_path):
 
     # Callbacks
     layer_monitoring = LayerActivationMonitoring()
-    evaluation_callback = callbacks.EvalCallback(eval_env,
-                                                 n_eval_episodes=10,
-                                                 eval_freq=8192,
-                                                 log_path=f'logs/evaluations/defend_the_center_test_{n}',
-                                                 best_model_save_path=f'logs/models/defend_the_center_test_{n}')
+    evaluation_callback = FragEvalCallback(eval_env,
+                                           n_eval_episodes=10,
+                                           eval_freq=16384,
+                                           log_path=f'logs/evaluations/{NAME}_{n}',
+                                           best_model_save_path=f'logs/models/{NAME}_{n}',
+                                           deterministic=True)
 
     # Play!
-    agent.learn(total_timesteps=500000, tb_log_name='ppo_defend_the_center_test', callback=[evaluation_callback, layer_monitoring])
+    agent.learn(total_timesteps=3000000, tb_log_name=NAME, callback=[evaluation_callback, layer_monitoring])
 
     env.close()
     eval_env.close()

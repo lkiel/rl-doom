@@ -1,4 +1,5 @@
 {
+  "config_name": "dm_shaping_curriculum",
   "model": {
     "name": "PPO",
     "parameters": {
@@ -11,6 +12,7 @@
     "policy": {
       "relu_slope": 0.1,
       "norm": "layer",
+      "features_dim": 128,
       "feature_extractor": "CNNFeatureExtractor",
       "net_arch": [{"pi": [64], "vf": [64]}]
     }
@@ -30,7 +32,8 @@
     "args": {
       "maps": ["flatmap2"],
       "bots": 8,
-      "curriculum": true
+      "curriculum": true,
+      "shaping": true
     },
     "vizdoom_mode": "PLAYER",
     "n_parallel": 4,

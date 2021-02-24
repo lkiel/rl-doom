@@ -32,6 +32,6 @@ if __name__ == '__main__':
         while not done:
             action, _ = agent.predict(obs, deterministic=False)
             obs, reward, done, _ = env.step(action)
-            time.sleep(1/60.0)
+            time.sleep(1/35.0)
 
     env.close()

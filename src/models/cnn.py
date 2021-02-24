@@ -1,5 +1,6 @@
 import gym
 import torch as th
+import typing as t
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from torch import nn
 
@@ -7,7 +8,7 @@ from models.hooks import Hooks
 
 
 class CNNFeatureExtractor(BaseFeaturesExtractor):
-    def __init__(self, observation_space: gym.spaces.Box, features_dim: int = 128, norm: str = None, **kwargs):
+    def __init__(self, observation_space: gym.spaces.Box, conv_filters: t.List = [32, 64, 64], features_dim: int = 128, norm: str = None, **kwargs):
         super().__init__(observation_space, features_dim)
 
         channels, height, width = observation_space.shape
@@ -18,9 +19,11 @@ class CNNFeatureExtractor(BaseFeaturesExtractor):
         if norm == 'layer': layers.append(nn.LayerNorm([channels, height, width]))
         if norm == 'batch': layers.append(nn.BatchNorm2d(channels))
 
-        layers = self.add_conv_layer(layers, channels, 32, ks=8, s=4, p=0, norm=norm, **kwargs)
-        layers = self.add_conv_layer(layers, 32, 64, ks=4, s=2, p=0, norm=norm, **kwargs)
-        layers = self.add_conv_layer(layers, 64, 64, ks=3, s=1, p=0, norm=norm, **kwargs)
+        cf1, cf2, cf3 = conv_filters
+
+        layers = self.add_conv_layer(layers, channels, cf1, ks=8, s=4, p=0, norm=norm, **kwargs)
+        layers = self.add_conv_layer(layers, cf1, cf2, ks=4, s=2, p=0, norm=norm, **kwargs)
+        layers = self.add_conv_layer(layers, cf2, cf3, ks=3, s=1, p=0, norm=norm, **kwargs)
         self.cnn = nn.Sequential(*layers, nn.Flatten())
 
         n_flatten = self.compute_shape(self.cnn)[1]

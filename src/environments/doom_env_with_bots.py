@@ -27,6 +27,7 @@ class DoomWithBots(DoomEnv):
 
         self.name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=2))
         self.n_bots = environment_config.env_args['bots']
+        self.shaping = environment_config.env_args['shaping']
         self.maps = maps
 
         print(maps)
@@ -203,7 +204,11 @@ class DoomWithBots(DoomEnv):
     def step(self, action, array=False):
         # Apply action
         _ = self.game.make_action(self.possible_actions[action] if not array else action, self.frame_skip)
-        reward = self.shape_rewards(initial_reward=0)
+
+        if self.shaping:
+            reward = self.shape_rewards(initial_reward=0)
+        else:
+            reward = self._compute_frag_reward()
 
         self._respawn_if_dead()
 

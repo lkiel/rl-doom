@@ -74,7 +74,7 @@ def create_vectorized_environment(n_envs: int, frame_stack: int, env_creation_fu
     :param env_creation_func: A callable returning a Gym environment.
     :return: A vectorized environment with frame stacking and image transposition.
     """
-    return VecTransposeImage(VecFrameStack(SubprocVecEnv([env_creation_func] * n_envs), frame_stack))
+    return VecTransposeImage(VecFrameStack(DummyVecEnv([env_creation_func] * n_envs), frame_stack))
 
 
 def get_training_env(environment_config: EnvironmentConfig) -> VecTransposeImage:

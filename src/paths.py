@@ -1,3 +1,4 @@
 SCENARIOS = '../scenarios'
-MODEL_LOGS = '../model_logs'
-TENSORBOARD_LOGS = '../tensorboard_logs'
+MODEL_LOGS = '../logs/models'
+EVALUATION_LOGS = '../logs/evaluations'
+TENSORBOARD_LOGS = '../logs/tensorboard'
