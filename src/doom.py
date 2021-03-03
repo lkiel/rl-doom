@@ -43,12 +43,12 @@ if __name__ == '__main__':
     layer_monitoring = LayerActivationMonitoring()
     evaluation_callback = FragEvalCallback(eval_env,
                                            n_eval_episodes=5,
-                                           eval_freq=8192,
+                                           eval_freq=16384,
                                            best_model_save_path=model_folder,
                                            log_path=f'{paths.EVALUATION_LOGS}/{name_suffix}/',
                                            deterministic=True)
 
-    agent.learn(total_timesteps=500000, tb_log_name=name_suffix.replace('/', '_'),
+    agent.learn(total_timesteps=10000000, tb_log_name=name_suffix.replace('/', '_'),
                 callback=[evaluation_callback, layer_monitoring])
 
     env.close()

@@ -33,13 +33,13 @@
     "args": {
       "maps": ["M", "M_R"],
       "bots": 8,
-      "curriculum": false,
+      "curriculum": true,
       "shaping": true
     },
     "vizdoom_mode": "PLAYER",
     "n_parallel": 4,
     "frame_skip": 4,
-    "frame_stack": 1,
+    "frame_stack": 4,
     "action_combination": true,
     "action_noop": false,
     "obs_width": 320,

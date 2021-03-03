@@ -19,8 +19,8 @@
     }
   },
   "schedules": {
-    "lr_start": 1e-4,
-    "lr_mid": 5e-4,
+    "lr_start": 5e-5,
+    "lr_mid": 1e-4,
     "lr_end": 1e-5,
     "lr_pcts": [
       0.4,
@@ -33,12 +33,12 @@
     "args": {
       "maps": ["M"],
       "bots": 8,
-      "curriculum": true,
+      "curriculum": false,
       "shaping": true
     },
     "vizdoom_mode": "PLAYER",
     "n_parallel": 4,
-    "frame_skip": 4,
+    "frame_skip": 1,
     "frame_stack": 1,
     "action_combination": true,
     "action_noop": false,

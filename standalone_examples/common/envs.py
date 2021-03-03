@@ -76,6 +76,51 @@ class DoomEnv(Env):
             self.game.get_state().screen_buffer) if not done else self.empty_frame
 
 
+class DoomWithBots(DoomEnv):
+
+    def __init__(self, game, frame_processor, frame_skip, n_bots):
+        super().__init__(game, frame_processor, frame_skip)
+        self.n_bots = n_bots
+        self.last_frags = 0
+        self._reset_bots()
+
+        # Redefine the action space using combinations.
+        self.possible_actions = get_available_actions(np.array(game.get_available_buttons()))
+        self.action_space = spaces.Discrete(len(possible_actions))
+
+    def step(self, action):
+        self.game.make_action(self.possible_actions[action], self.frame_skip)
+
+        # Compute rewards.
+        frags = self.game.get_game_variable(GameVariable.FRAGCOUNT)
+        reward = frags - self.last_frags
+        self.last_frags = frags
+
+        # Check for episode end.
+        self._respawn_if_dead()
+        done = self.game.is_episode_finished()
+        self.state = self._get_frame(done)
+
+        return self.state, reward, done, {}
+
+    def reset(self):
+        self._reset_bots()
+        self.last_frags = 0
+
+        return super().reset()
+
+    def _respawn_if_dead(self):
+        if not self.game.is_episode_finished():
+            if self.game.is_player_dead():
+                self.game.respawn_player()
+
+    def _reset_bots(self):
+        # Make sure you have the bots.cfg file next to the program entry point.
+        self.game.send_game_command('removebots')
+        for i in range(self.n_bots):
+            self.game.send_game_command('addbot')
+
+
 def create_env(scenario: str, **kwargs) -> DoomEnv:
     # Create a VizDoom instance.
     game = vizdoom.DoomGame()
@@ -86,8 +131,23 @@ def create_env(scenario: str, **kwargs) -> DoomEnv:
     return DoomEnv(game, **kwargs)
 
 
+def create_env_with_bots(scenario, **kwargs) -> DoomEnv:
+    # Create a VizDoom instance.
+    game = vizdoom.DoomGame()
+    game.load_config(f'scenarios/{scenario}.cfg')
+    game.add_game_args('-host 1 -deathmatch +viz_nocheat 0 +cl_run 1 +name AGENT +colorset 0' +
+                       '+sv_forcerespawn 1 +sv_respawnprotect 1 +sv_nocrouch 1 +sv_noexit 1')
+    game.init()
+
+    return DoomWithBots(game, **kwargs)
+
+
 def create_vec_env(n_envs=1, **kwargs) -> vec_env.VecTransposeImage:
     return vec_env.VecTransposeImage(vec_env.DummyVecEnv([lambda: create_env(**kwargs)] * n_envs))
+
+
+def vec_env_with_bots(n_envs=1, **kwargs) -> vec_env.VecTransposeImage:
+    return vec_env.VecTransposeImage(vec_env.DummyVecEnv([lambda: create_env_with_bots(**kwargs)] * n_envs))
 
 
 def create_eval_vec_env(**kwargs) -> vec_env.VecTransposeImage:
