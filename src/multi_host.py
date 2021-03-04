@@ -1,93 +1,102 @@
-from __future__ import print_function
-
 import time
-from random import choice
+from multiprocessing import Process
 
-from stable_baselines3 import PPO
-from stable_baselines3.common.vec_env import VecTransposeImage, VecFrameStack, DummyVecEnv
-from vizdoom.vizdoom import DoomGame, Mode, GameVariable
+import torch as th
+from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack, VecTransposeImage
+from vizdoom.vizdoom import DoomGame, Mode, GameVariable, Button
 
-from environments import doom_env
+import config
+from environments import utils
 from environments.doom_env import DoomEnv
-from helpers import controls
+from helpers import cli
 
 episodes = 10
-import torch as th
-def player1():
+
+
+def player1(n_bots):
     game = DoomGame()
-    game.load_config('../scenarii/custom_bots_v3.cfg')
-    game.set_doom_scenario_path('../scenarii/custom_bots_v3.wad')
-    game.set_doom_map('flatmap3')
+    game.load_config('../scenarios/bots_deathmatch_multimaps.cfg')
+    game.set_doom_map('M')
     game.set_mode(Mode.SPECTATOR)
     game.add_game_args("-host 2 -deathmatch +cl_run 1")
-    game.add_game_args("+name Player1 +colorset 0")
-    #game.set_ticrate(45)
+    game.add_game_args("+name EoD +colorset 0")
+
+    game.set_ticrate(35)
+
     game.init()
 
-    # Play until the game (episode) is over.
-    while not game.is_episode_finished():
+    for i in range(n_bots):
+        game.send_game_command("addbot")
 
+    while not game.is_episode_finished():
         game.advance_action()
 
-        # Check if player is dead
         if game.is_player_dead():
-            # Use this to respawn immediately after death, new state will be available.
             game.respawn_player()
 
+    time.sleep(2)
     game.close()
 
-def player2():
-    game = DoomGame()
-    game.load_config('../scenarii/custom_bots_v3.cfg')
-    game.set_doom_scenario_path('../scenarii/custom_bots_v3.wad')
-    game.set_doom_map('flatmap3')
-    game.set_mode(Mode.PLAYER)
-    game.add_game_args("-join 127.0.0.1 +name Leo +cl_run 1")
 
+def player2(args):
+    load_from = args.load
+    config_path = args.config
+
+    # Load config for session
+    conf = config.load(config_path)
+
+    game, possible_actions = utils.create_game(conf.environment_config)
+    game.add_game_args("-join 127.0.0.1 +name HAL9001 +cl_run 1")
+    game.set_doom_map('M')
+    game.set_mode(Mode.PLAYER)
     game.init()
 
-    possible_actions = controls.get_available_actions(game.get_available_buttons(),
-                                                      add_combinations=True,
-                                                      add_noop=False)
-    env = VecTransposeImage(VecFrameStack(DummyVecEnv([lambda: DoomEnv(game, possible_actions)]), n_stack=4))
+    env = VecTransposeImage(
+        VecFrameStack(
+            DummyVecEnv([lambda: DoomEnv(game, possible_actions, conf.environment_config)]),
+            conf.environment_config.frame_stack))
 
-    agent = PPO.load(r'D:\Leandro\ML\doom_rl\trained_agents\flatmap_3_out=18_stack=4\agent.zip')
+    # Load agent
+    agent = conf.get_agent(env=env, load_from=load_from)
+    agent.policy.to('cpu')
 
-    obs=None
+    obs = None
 
-    t1 = time.time_ns()
     t2 = time.time_ns()
-    print_freq = 100
-    i = 0
-    for i in range(episodes):
-        while not game.is_episode_finished():
-            i+=1
-            if game.is_player_dead():
-                game.respawn_player()
+    t1 = t2
+
+    frame_counter = 0
+
+    while not game.is_episode_finished():
+        if game.is_player_dead():
+            game.respawn_player()
+
+        t2 = time.time_ns()
+        if t2 - t1 > 1e9:
             t1 = t2
-            t2 = time.time_ns()
-            if i % print_freq == 0:
-                print(f'{(t2 - t1) // 1e6}')
-            if obs is not None:
-                obs_tensor = th.as_tensor(obs).to('cuda')
-                action, values, log_probs = agent.policy.forward(obs_tensor)
-                obs, _, _, _ = env.step(action.cpu().numpy())
-            else:
-                obs, _, _, _  = env.step([0])
+            #print(frame_counter)
+            frame_counter = 0
 
-            #game.make_action(choice(actions))
+        if obs is not None:
+            obs_tensor = th.as_tensor(obs)
+            action, values, log_probs = agent.policy.forward(obs_tensor)
+            obs, _, _, _ = env.step(action.cpu().numpy())
+            frame_counter += 1
+        else:
+            obs, _, _, _ = env.step([0])
 
-        print("Player2 frags:", game.get_game_variable(GameVariable.FRAGCOUNT))
-        game.new_episode()
+        # game.make_action(choice(actions))
 
     game.close()
 
-from multiprocessing import Process
+
 if __name__ == '__main__':
-    p1 = Process(target=player1)
+    parser = cli.get_parser()
+    parser.add_argument('-b', '--bots', type=int)
+    args = parser.parse_args()
+
+    p1 = Process(target=player1, args=(args.bots,))
     p1.start()
-    player2()
+    player2(args)
 
     print("Done")
-
-
