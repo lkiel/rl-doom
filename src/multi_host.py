@@ -3,9 +3,10 @@ from multiprocessing import Process
 
 import torch as th
 from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack, VecTransposeImage
-from vizdoom.vizdoom import DoomGame, Mode, GameVariable, Button
+from vizdoom.vizdoom import DoomGame, Mode
 
 import config
+import paths
 from environments import utils
 from environments.doom_env import DoomEnv
 from helpers import cli
@@ -13,9 +14,14 @@ from helpers import cli
 episodes = 10
 
 
-def player1(n_bots):
+def player1(args):
+    config_path = args.config
+
+    # Load config for session
+    conf = config.load(config_path)
+
     game = DoomGame()
-    game.load_config('../scenarios/bots_deathmatch_multimaps.cfg')
+    game.load_config(f'{paths.SCENARIOS}/{conf.environment_config.scenario}.cfg')
     game.set_doom_map('M')
     game.set_mode(Mode.SPECTATOR)
     game.add_game_args("-host 2 -deathmatch +cl_run 1")
@@ -25,7 +31,7 @@ def player1(n_bots):
 
     game.init()
 
-    for i in range(n_bots):
+    for i in range(args.bots):
         game.send_game_command("addbot")
 
     while not game.is_episode_finished():
@@ -74,7 +80,7 @@ def player2(args):
         t2 = time.time_ns()
         if t2 - t1 > 1e9:
             t1 = t2
-            #print(frame_counter)
+            # print(frame_counter)
             frame_counter = 0
 
         if obs is not None:
@@ -95,7 +101,7 @@ if __name__ == '__main__':
     parser.add_argument('-b', '--bots', type=int)
     args = parser.parse_args()
 
-    p1 = Process(target=player1, args=(args.bots,))
+    p1 = Process(target=player1, args=(args,))
     p1.start()
     player2(args)
 
