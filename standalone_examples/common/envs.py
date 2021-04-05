@@ -5,6 +5,13 @@ import vizdoom
 from gym import Env
 from gym import spaces
 from stable_baselines3.common import vec_env
+from stable_baselines3.common.callbacks import EvalCallback
+from stable_baselines3.ppo import ppo, policies
+from vizdoom import GameVariable
+
+from common.models import init_model
+from common.monitoring import LayerActivationMonitoring
+from common.utils import get_available_actions
 
 Frame = np.ndarray
 
@@ -86,7 +93,7 @@ class DoomWithBots(DoomEnv):
 
         # Redefine the action space using combinations.
         self.possible_actions = get_available_actions(np.array(game.get_available_buttons()))
-        self.action_space = spaces.Discrete(len(possible_actions))
+        self.action_space = spaces.Discrete(len(self.possible_actions))
 
     def step(self, action):
         self.game.make_action(self.possible_actions[action], self.frame_skip)
@@ -120,6 +127,19 @@ class DoomWithBots(DoomEnv):
         for i in range(self.n_bots):
             self.game.send_game_command('addbot')
 
+    def _print_state(self):
+        server_state = self.game.get_server_state()
+        player_scores = list(zip(
+            server_state.players_names,
+            server_state.players_frags,
+            server_state.players_in_game))
+        player_scores = sorted(player_scores, key=lambda tup: tup[1])
+
+        print('*** DEATHMATCH RESULTS ***')
+        for player_name, player_score, player_ingame in player_scores:
+            if player_ingame:
+                print(f' - {player_name}: {player_score}')
+
 
 def create_env(scenario: str, **kwargs) -> DoomEnv:
     # Create a VizDoom instance.
@@ -152,3 +172,22 @@ def vec_env_with_bots(n_envs=1, **kwargs) -> vec_env.VecTransposeImage:
 
 def create_eval_vec_env(**kwargs) -> vec_env.VecTransposeImage:
     return create_vec_env(n_envs=1, **kwargs)
+
+
+def solve_env(env, eval_env, scenario, agent_args):
+    # Build the agent.
+    agent = ppo.PPO(policies.ActorCriticCnnPolicy, env, tensorboard_log='logs/tensorboard', seed=0, **agent_args)
+    init_model(agent)
+
+    # Create callbacks.
+    monitoring_callback = LayerActivationMonitoring()
+
+    eval_callback = EvalCallback(
+        eval_env,
+        n_eval_episodes=5,
+        eval_freq=16384,
+        log_path=f'logs/evaluations/{scenario}',
+        best_model_save_path=f'logs/models/{scenario}')
+
+    # Start the training process.
+    agent.learn(total_timesteps=3000000, tb_log_name=scenario, callback=[monitoring_callback, eval_callback])
