@@ -1,5 +1,6 @@
 import typing as t
 
+import cv2
 import numpy as np
 import vizdoom
 from gym import Env
@@ -14,6 +15,19 @@ from common.monitoring import LayerActivationMonitoring
 from common.utils import get_available_actions
 
 Frame = np.ndarray
+
+DOOM_ENV_WITH_BOTS_ARGS = """
+    -host 1 
+    -deathmatch 
+    +viz_nocheat 0 
+    +cl_run 1 
+    +name AGENT 
+    +colorset 0 
+    +sv_forcerespawn 1 
+    +sv_respawnprotect 1 
+    +sv_nocrouch 1 
+    +sv_noexit 1
+    """
 
 
 class DoomEnv(Env):
@@ -141,6 +155,10 @@ class DoomWithBots(DoomEnv):
                 print(f' - {player_name}: {player_score}')
 
 
+def default_frame_processor(frame: Frame) -> Frame:
+    return cv2.resize(frame[40:, 4:-4], None, fx=.5, fy=.5, interpolation=cv2.INTER_AREA)
+
+
 def create_env(scenario: str, **kwargs) -> DoomEnv:
     # Create a VizDoom instance.
     game = vizdoom.DoomGame()
@@ -151,22 +169,21 @@ def create_env(scenario: str, **kwargs) -> DoomEnv:
     return DoomEnv(game, **kwargs)
 
 
-def create_env_with_bots(scenario, **kwargs) -> DoomEnv:
+def create_env_with_bots(scenario: str, **kwargs) -> DoomEnv:
     # Create a VizDoom instance.
     game = vizdoom.DoomGame()
     game.load_config(f'scenarios/{scenario}.cfg')
-    game.add_game_args('-host 1 -deathmatch +viz_nocheat 0 +cl_run 1 +name AGENT +colorset 0' +
-                       '+sv_forcerespawn 1 +sv_respawnprotect 1 +sv_nocrouch 1 +sv_noexit 1')
+    game.add_game_args(DOOM_ENV_WITH_BOTS_ARGS)
     game.init()
 
     return DoomWithBots(game, **kwargs)
 
 
-def create_vec_env(n_envs=1, **kwargs) -> vec_env.VecTransposeImage:
+def create_vec_env(n_envs: int = 1, **kwargs) -> vec_env.VecTransposeImage:
     return vec_env.VecTransposeImage(vec_env.DummyVecEnv([lambda: create_env(**kwargs)] * n_envs))
 
 
-def vec_env_with_bots(n_envs=1, **kwargs) -> vec_env.VecTransposeImage:
+def vec_env_with_bots(n_envs: int = 1, **kwargs) -> vec_env.VecTransposeImage:
     return vec_env.VecTransposeImage(vec_env.DummyVecEnv([lambda: create_env_with_bots(**kwargs)] * n_envs))
 
 
@@ -174,7 +191,7 @@ def create_eval_vec_env(**kwargs) -> vec_env.VecTransposeImage:
     return create_vec_env(n_envs=1, **kwargs)
 
 
-def solve_env(env, eval_env, scenario, agent_args):
+def solve_env(env: vec_env.VecTransposeImage, eval_env: vec_env.VecTransposeImage, scenario: str, agent_args: t.Dict):
     # Build the agent.
     agent = ppo.PPO(policies.ActorCriticCnnPolicy, env, tensorboard_log='logs/tensorboard', seed=0, **agent_args)
     init_model(agent)
@@ -191,3 +208,6 @@ def solve_env(env, eval_env, scenario, agent_args):
 
     # Start the training process.
     agent.learn(total_timesteps=3000000, tb_log_name=scenario, callback=[monitoring_callback, eval_callback])
+
+    env.close()
+    eval_env.close()
