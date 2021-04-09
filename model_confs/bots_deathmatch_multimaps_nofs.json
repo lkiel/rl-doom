@@ -39,7 +39,7 @@
     "vizdoom_mode": "PLAYER",
     "n_parallel": 4,
     "frame_skip": 1,
-    "frame_stack": 1,
+    "frame_stack": 4,
     "action_combination": true,
     "action_noop": false,
     "obs_width": 320,

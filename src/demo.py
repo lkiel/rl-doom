@@ -25,12 +25,17 @@ if __name__ == '__main__':
     # Load agent
     agent = conf.get_agent(env=env, load_from=load_from)
 
+    # Extract button acronyms
+    buttons = env.venv.envs[0].game.get_available_buttons()
+    buttons = [''.join([c[0] for c in str(b).split('.')[1].split('_')]) for b in buttons]
+
     for i in range(10):
         obs = env.reset()
         done = False
         images = []
         while not done:
             action, _ = agent.predict(obs, deterministic=False)
+            print([f'{b}: {a}' for b, a in zip(buttons, action)], end='\r', flush=True)
             obs, reward, done, _ = env.step(action)
             time.sleep(1/35.0)
 

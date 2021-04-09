@@ -12,6 +12,7 @@
     "policy": {
       "relu_slope": 0.1,
       "norm": "layer",
+      "conv_filters": [32, 64, 64],
       "features_dim": 512,
       "feature_extractor": "CNNFeatureExtractor",
       "net_arch": [{"pi": [256], "vf": [256]}]
@@ -38,7 +39,7 @@
     "vizdoom_mode": "PLAYER",
     "n_parallel": 4,
     "frame_skip": 2,
-    "frame_stack": 1,
+    "frame_stack": 4,
     "action_combination": true,
     "action_noop": false,
     "obs_width": 320,
