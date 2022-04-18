@@ -31,10 +31,18 @@ class EnvironmentConfig:
     def __init__(self, params: t.Dict):
         self.scenario = params['scenario']
 
+        # Doom env parameters
         self.n_envs = params['n_parallel']
         self.frame_stack = params['frame_stack']
         self.frame_skip = params['frame_skip']
+        self.env_type = params['type']
+        self.env_args = params['args']
 
+        # Action space parameters
+        self.action_combination = params['action_combination']
+        self.action_noop = params['action_noop']
+
+        # Observation space parameters
         self.raw_channels = params['obs_channels']
         self.raw_width = params['obs_width']
         self.raw_height = params['obs_height']
@@ -46,7 +54,7 @@ class EnvironmentConfig:
         self.screen_resolution = environment_constants.RESOLUTION_TO_VZD[(self.raw_width, self.raw_height)]
 
     def get_log_name(self):
-        return 'scenario={}/nenvs={}_stack={}_skip={}'.format(
+        return '{}/nenvs={}_stack={}_skip={}'.format(
             self.scenario,
             self.n_envs,
             self.frame_stack,
@@ -86,6 +94,9 @@ class ModelConfig:
         self.policy_kwargs = {
             'features_extractor_class': constants.NETS[self.policy_params['feature_extractor']],
             'features_extractor_kwargs': {
+                'conv_filters': self.policy_params['conv_filters'],
+                'features_dim': self.policy_params['features_dim'],
+                'norm': self.policy_params['norm'],
                 'negative_slope': self.policy_params['relu_slope']
             },
             'net_arch': params['policy']['net_arch'],
@@ -94,8 +105,9 @@ class ModelConfig:
         }
 
     def get_log_name(self):
-        return 'algo={}_pi={}_vf={}'.format(
+        return 'algo={}_ft={}_pi={}_vf={}'.format(
             self.model,
+            self.policy_kwargs['features_extractor_kwargs']['features_dim'],
             '-'.join(map(str, self.policy_params['net_arch'][-1]['pi'])),
             '-'.join(map(str, self.policy_params['net_arch'][-1]['vf'])),
         )
@@ -105,6 +117,7 @@ class TrainingConfig:
     """Class holding configuration for a training session."""
     def __init__(self, params: t.Dict):
         self.params = params
+        self.name = params['config_name']
         self.model_config = ModelConfig(params['model'])
         self.environment_config = EnvironmentConfig(params['env'])
         self.learning_config = LearningConfig(params['schedules'])
@@ -142,7 +155,8 @@ class TrainingConfig:
                 scenario=basic_algo=PPO_nenvs=1_input=100x160x3-RGB24_stack=1_skip=4_output=3
 
         """
-        return '{}/{}_in={}_out={}'.format(
+        return '{}/{}/{}_in={}_out={}'.format(
+            self.name,
             self.environment_config.get_log_name(),
             self.model_config.get_log_name(),
             "x".join([str(dimension) for dimension in input_shape]),

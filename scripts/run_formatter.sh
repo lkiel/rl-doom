@@ -6,7 +6,7 @@ IFS=$'\n\t'
 function main() {
   # Run formatter
   set +e  # Do not stop if exit status code is non-zero.
-  yapf --style='{based_on_style: pep8, column_limit: 120}' -i -r src
+  yapf --style='{based_on_style: pep8, column_limit: 100}' -i -r standalone_examples
   set -e
 }
 

@@ -1,6 +1,8 @@
 from stable_baselines3.common.callbacks import EvalCallback
 
 import config
+from callbacks.FragEvalCallback import FragEvalCallback
+from callbacks.LayerMonitoring import LayerActivationMonitoring
 from environments import constants as env_constants
 from environments import utils as env_utils
 from helpers import cli
@@ -12,7 +14,6 @@ if __name__ == '__main__':
     parser = cli.get_parser()
     args = parser.parse_args()
 
-    scenario = args.scenario
     load_from = args.load
     features_only = args.features_only
     config_path = args.config
@@ -33,17 +34,22 @@ if __name__ == '__main__':
     # Build the agent
     agent = conf.get_agent(env=env, load_from=load_from)
 
+    print(agent.policy)
+
     if not load_from:
         helpers.init_weights(agent, conf.model_config)
 
     # Start the training process.
-    evaluation_callback = EvalCallback(eval_env,
-                                       n_eval_episodes=10,
-                                       eval_freq=15000,
-                                       best_model_save_path=model_folder,
-                                       deterministic=True)
+    layer_monitoring = LayerActivationMonitoring()
+    evaluation_callback = FragEvalCallback(eval_env,
+                                           n_eval_episodes=5,
+                                           eval_freq=16384,
+                                           best_model_save_path=model_folder,
+                                           log_path=f'{paths.EVALUATION_LOGS}/{name_suffix}/',
+                                           deterministic=True)
 
-    agent.learn(total_timesteps=5000000, tb_log_name=name_suffix.replace('/', '_'), callback=[evaluation_callback])
+    agent.learn(total_timesteps=10000000, tb_log_name=name_suffix.replace('/', '_'),
+                callback=[evaluation_callback, layer_monitoring])
 
     env.close()
     eval_env.close()

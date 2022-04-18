@@ -21,5 +21,5 @@ class FramePreprocessor:
 
 
 if __name__ == '__main__':
-    preprocessor = FramePreprocessor(scale=[1.0, 1.0], crop=[2, 2, 2, 2])
-    print(timeit.timeit(lambda: preprocessor.process(np.zeros((10, 10, 3))), number=100000))
+    preprocessor = FramePreprocessor(scale=[.5, .5], crop=[40, 3, 0, 3])
+    print(preprocessor.process(np.zeros((240, 320, 3))).shape)

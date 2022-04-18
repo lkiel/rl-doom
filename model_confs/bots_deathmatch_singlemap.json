@@ -1,0 +1,59 @@
+{
+  "config_name": "classic_singlemap",
+  "model": {
+    "name": "PPO",
+    "parameters": {
+      "verbose": 1,
+      "n_steps": 4096,
+      "batch_size": 32,
+      "n_epochs": 3,
+      "seed": 123
+    },
+    "policy": {
+      "relu_slope": 0.1,
+      "norm": "layer",
+      "conv_filters": [32, 64, 64],
+      "features_dim": 512,
+      "feature_extractor": "CNNFeatureExtractor",
+      "net_arch": [{"pi": [256], "vf": [256]}]
+    }
+  },
+  "schedules": {
+    "lr_start": 5e-5,
+    "lr_mid": 1e-4,
+    "lr_end": 1e-5,
+    "lr_pcts": [
+      0.4,
+      0.6
+    ]
+  },
+  "env": {
+    "scenario": "bots_deathmatch_multimaps",
+    "type": "multiplayer",
+    "args": {
+      "maps": ["M"],
+      "bots": 8,
+      "curriculum": false,
+      "shaping": true
+    },
+    "vizdoom_mode": "PLAYER",
+    "n_parallel": 4,
+    "frame_skip": 1,
+    "frame_stack": 1,
+    "action_combination": true,
+    "action_noop": false,
+    "obs_width": 320,
+    "obs_height": 240,
+    "obs_channels": 3,
+    "obs_crop": [
+      40,
+      4,
+      0,
+      4
+    ],
+    "obs_resize": [
+      0.5,
+      0.5
+    ]
+  }
+}

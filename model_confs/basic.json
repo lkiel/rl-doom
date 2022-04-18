@@ -29,6 +29,8 @@
     "n_parallel": 1,
     "frame_skip": 4,
     "frame_stack": 1,
+    "action_combination": false,
+    "action_noop": false,
     "obs_width": 320,
     "obs_height": 240,
     "obs_channels": 3,
