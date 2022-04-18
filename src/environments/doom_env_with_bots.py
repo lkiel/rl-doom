@@ -8,6 +8,9 @@ from vizdoom.vizdoom import GameVariable
 from config import EnvironmentConfig
 from environments.doom_env import DoomEnv
 
+
+# TODO cleanup and add documentation
+
 MAX_DISTANCE = 16.66
 GAME_TIC_RATE = 35
 
@@ -100,6 +103,7 @@ class DoomWithBots(DoomEnv):
         distance = np.sqrt(dx ** 2 + dy ** 2)
         d = distance - self.reward_threshold_distance
 
+        # TODO: fix
         if d > 0:
             reward = 0.0005 #self.reward_factor_distance * d
         else:
